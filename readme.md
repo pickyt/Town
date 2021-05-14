@@ -23,7 +23,7 @@ python population and economy simulator by picky
 ##Installation and config
 Requires python 3+
 ```
-clone using
+download and extract [zip](https://github.com/pickyt/Town/archive/refs/heads/master.zip)
 
 python3 Town.py
 
