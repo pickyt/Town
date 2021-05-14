@@ -1,6 +1,5 @@
 import random
 import math
-
 meeple = []
 resource = []
 class Meeple:
@@ -12,11 +11,14 @@ class Meeple:
         self.age = age
         self.job = job
         self.married = False
-        self.partner = []
+        self.parents = []
+        self.siblings = []
         self.children = []
+        self.partner = []
         self.inventory = {
          "bal" : bal
         }
+
     def addItem(self,item,amount):
         if item not in self.inventory:
             self.inventory.update({item:amount})
@@ -32,15 +34,18 @@ class Meeple:
                 other.partner = self.name
                 updatenames(meeple)
                 self.partner = other.name
+                other.partner = self.name
                 self.married = True
+                other.married = True
 
             else:
                 self.lname = other.lname
                 other.partner = self.name
                 updatenames(meeple)
                 self.partner = other.name
+                other.partner = self.name
                 self.married = True
-
+                other.married = True
 
     def haveChild(self,other,children):
         if self.married :
@@ -49,12 +54,30 @@ class Meeple:
                     sex = "Male"
                 else:
                     sex = "Female"
-                self.children = Meeple(getName(sex)[0],self.lname,sex,0,"unemployed",0)
-                meeple.append(self.children)
+                self.children.append(Meeple(getName(sex)[0],self.lname,sex,0,"unemployed",0))
+                other.children = self.children
+            for child in self.children:
+                meeple.append(child)
+                child.parents = [self,other]
+                for otherchild in self.children:
+                    if child!=otherchild:
+                        child.siblings.append(otherchild)
+
         else:
-            print('Married'+ self.married)
+            self.marry(other)
+            self.haveChild(other,children)
 
-
+    def getRelativeNames(self,op):
+        names = []
+        if op == "children":
+            relative = self.children
+        elif op == "parents":
+            relative = self.parents
+        elif op == "siblings":
+            relative = self.siblings
+        for i in relative:
+            names.append(i.name)
+        return names
 
 class Resource:
     def __init__(self,name,rarity):
@@ -100,7 +123,7 @@ def getName(sex):
 def listMeeples(option = "all"):
     for i in meeple:
         if  option == "all":
-            print(f' name: {i.name} \n Sex: {i.sex}     Age: {i.age}    Occupation: {i.job}     Balance: ${i.inventory["bal"]}   Married to: {i.partner} \n Inventory : {i.inventory}\n')
+            print(f' name: {i.name} \n Sex: {i.sex}     Age: {i.age}    Occupation: {i.job}     Balance: ${i.inventory["bal"]}   Married to: {i.partner}\n Children are :{i.getRelativeNames("children")} \n Parents are :{i.getRelativeNames("parents")} \n Siblings are : {i.getRelativeNames("siblings")} \n Inventory : {i.inventory}\n')
         elif option == "names":
             print(i.name)
         elif option == "sex":
@@ -117,11 +140,13 @@ def listMeeples(option = "all"):
             print(f' first name is {i.fname}')
         elif option == "lname":
             print(f' {i.fname}s last name is {i.lname}')
+        elif option == "lname":
+            print(f' {i.fname}s children are {i.children}')
 
-generateMeeples(4)
+generateMeeples(2)
 listMeeples("all")
 print(len(meeple))
-meeple[len(meeple)-1].marry(meeple[len(meeple)-2])
-meeple[len(meeple)-1].haveChild(meeple[len(meeple)-2],2)
+# meeple[len(meeple)-1].marry(meeple[len(meeple)-2])
+meeple[len(meeple)-1].haveChild(meeple[len(meeple)-2],4)
 listMeeples("all")
 print(len(meeple))
